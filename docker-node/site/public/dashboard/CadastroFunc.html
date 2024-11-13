@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RemoteGuard - Visualize, analise, transforme.</title>
+    <link rel="stylesheet" href="../css/dashboard-teste.css">
+    <link rel="stylesheet" href="../css/cadastro-Note.css">
+    <link rel="icon" href="../assets/imgs/logo4-amarela.svg">
+</head>
+
+<body onload="listarGerente()">
+    <header id="main-header">
+        <div class="menu-icone" id="menu-icone">
+            <img src="../assets/imgs/2.png" alt="Menu" class="menu-img">
+        </div>
+        <div class="perfil-wrapper">
+            <div class="Ativacao">
+                <button>Ajuda</button>
+            </div>
+
+            <div class="perfil-container">
+                <img src="../assets/imgs/a.png" alt="Imagem de Perfil">
+                <div class="perfil-text">
+                    <span class="nome">Gerente</span>
+                    <span class="legenda">perfil</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav id="menuhamburguer">
+        <div class="logo">
+            <img src="../assets/imgs/logo4-amarela.svg" alt="Logo">
+        </div>
+        <ul class="menu-items">
+            <li class="naoAtivo"><a href="DashGerente.html"><img src="../assets/imgs/dash.png" alt="Ícone 1">Dashboard</a></li>
+            <li class="naoAtivo"><a href=""><img src="../assets/imgs/relatorio.png" alt="Ícone 1">Relatórios</a></li>
+            <li class="ativo"><a href="CadastroFunc.html"><img src="../assets/imgs/perfil.png" alt="Ícone 1">Funcionarios</a></li>
+            <li class="naoAtivo"><a href="cadastroNote.html"><img src="../assets/imgs/Maquina.png" alt="Ícone 1"> Maquinas</a></li>
+            <li class="naoAtivo"><a href="perfilGerente.html"><img src="../assets/imgs/config.png" alt="Ícone 1">Configuração</a></li>
+            <li class="naoAtivo"><a href="../login.html"><img src="../assets/imgs/sair.png" alt="Ícone 1">Sair</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="left-side">
+            <h2>Bem-vindo de volta!</h2>
+            <p>Cadastre os dados de um novo notebook ou funcionário no sistema.</p>
+
+            <button class="btn-entrar" onclick="window.location.href='cadastroNote.html';">Cadastrar
+                Máquina</button>
+        </div>
+        <div class="right-side">
+            <h2>Criar Cadastro</h2>
+            <div class="grid-form">
+                <div class="scroll-container">
+                    <form class="form">
+                        <div class="form-grupo">
+                            <input type="text" id="input_nome" placeholder="Nome">
+                        </div>
+
+                        <div class="form-grupo">
+                            <input type="text" id="input_cpf" placeholder="CPF">
+                        </div>
+
+                        <div class="form-grupo">
+                            <input type="password" id="input_senha" placeholder="Senha">
+                        </div>
+
+                        <div class="form-grupo">
+                            <input type="text" id="input_email" placeholder="E-mail">
+                        </div>
+
+                        <div class="form-grupo">
+                            <select id="input_cargo">
+                                <option value="#">Selecione o Cargo</option>
+                                <option value="analista">Analista</option>
+                                <option value="desenvolvedor">Desenvolvedor</option>
+                                <option value="qea">Q&A</option>
+                                <option value="dba">DBA</option>
+                                <option value="outros">Outros</option>
+                            </select>
+                        </div>
+
+                </div>
+                <button onclick="cadastrar()" type="submit" class="btn-submit">Cadastrar funcionário</button>
+                </form>
+            </div>
+        </div>
+</body>
+
+</html>
+
+<script>
+        var requisicaoPadrao = '';
+        var empresas = [];
+        var tokens = [];
+        var id = [];
+        var empresaGerente = ""
+
+    // Manipulação do menu hamburguer
+    document.getElementById('menu-icone').addEventListener('click', function () {
+        var menuhamburguer = document.getElementById('menuhamburguer');
+        var mainContainer = document.getElementById('main-Container');
+        var header = document.getElementById('main-header');
+
+        // Alterna a classe 'open' para o menu e a 'menu-open' para o conteúdo e header
+        menuhamburguer.classList.toggle('open');
+        document.body.classList.toggle('menu-open');
+    });
+
+    const menuItems = document.querySelectorAll('.menu-items li');
+
+    menuItems.forEach(item => {
+        item.addEventListener('click', function () {
+            // Remove a classe 'active' de todos os itens
+            menuItems.forEach(el => el.classList.remove('active'));
+            // Adiciona a classe 'active' ao item clicado
+            this.classList.add('active');
+        });
+    });
+
+
+        // Função para listar a empresa que o gerente trabalha
+        function listarGerente() {
+            idUsuario = sessionStorage.ID_USUARIO
+                fetch("/usuarios/listarGerente", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ 
+                    idUsuarioServer : idUsuario
+                })
+               }).then(function (resposta) {
+                if (resposta.ok) {
+                    resposta.json().then(json => {
+                        json.resultado.forEach(empresa => {
+                            empresaGerente = empresa.fkEmpresa
+                        });
+                    });
+                } else {
+                    throw "Erro ao buscar a fkEmpresa do gerente!";
+                }
+               })
+            }
+
+        
+
+
+        function cadastrar() {
+            var nomeVar = input_nome.value;
+            var emailVar = input_email.value;
+            var senhaVar = input_senha.value;
+            var cargoVar = input_cargo.value;
+            var nomeEmpresaVar = empresaGerente;
+            var cpfVar = input_cpf.value;
+
+            var fazerCadastro = true;
+
+
+            if (nomeVar === "" || emailVar === "" || senhaVar === "" || cargoVar === "" || cpfVar === "") {
+                alert("Todos os campos devem estar preenchidos!");
+                fazerCadastro = false;
+            }
+
+            if (senhaVar.length < 5 || senhaVar.length > 15) {
+                alert("A senha deve ter entre 5 e 15 caracteres!");
+                fazerCadastro = false;
+            }
+
+            if (!/[!@#$%^&*]/.test(senhaVar)) {
+                alert("A senha deve conter pelo menos um caractere especial!");
+                fazerCadastro = false;
+            }
+
+            // if (cpfVar.length != 11) {
+            //     alert("CPF inválido! Deve conter 11 dígitos.");
+            //     fazerCadastro = false;
+            // }
+
+            if (!emailVar.includes('@') || !emailVar.includes('.')) {
+                alert("E-mail inválido! Certifique-se de que contém '@' e '.'");
+                fazerCadastro = false;
+            }
+
+            if (fazerCadastro) {
+                fetch("/usuarios/cadastrar", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        nomeServer: nomeVar,
+                        emailServer: emailVar,
+                        senhaServer: senhaVar,
+                        empresaServer: nomeEmpresaVar,
+                        cargoServer: cargoVar,
+                        cpfServer: cpfVar
+                    }),
+                }).then(function (resposta) {
+                    if (resposta.ok) {
+                        alert("Cadastro feito com sucesso");
+                    } else {
+                        resposta.json().then(json => {
+                            if (JSON.stringify(json).includes("Duplicate entry")) {
+                                alert("O email utilizado já existe no sistema");
+                            }
+                        });
+                    }
+                }).catch(function (erro) {
+                    console.log(erro);
+                });
+            }
+        }
+</script>
