@@ -171,7 +171,7 @@ success "Docker Configurado com Sucesso!\n"
 # Criando e Configurando Containeres
 info "Iniciando Criação e Configuração dos Containeres da Aplicação...\n"
 cd RemoteGuard-Env/
-docker compose -f ~/RemoteGuard-Env/docker-compose.yml up -d
+sudo docker compose -f ~/RemoteGuard-Env/docker-compose.yml up -d
 
 if [ $? -eq 0 ]
         then success "Containeres Criados e Configurados com Sucesso!\n"
