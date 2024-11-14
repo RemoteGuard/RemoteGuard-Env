@@ -164,19 +164,17 @@ sudo systemctl enable docker
 # Adicionando o Usuário ao Grupo do Docker
 info "Adicionando Usuário ao Grupo do Docker...\n"
 sudo usermod -aG docker $USER
-newgrp docker << EOF
-    success "Docker Configurado com Sucesso!\n"
 
-    # Criando e Configurando Containeres
-    info "Iniciando Criação e Configuração dos Containeres da Aplicação...\n"
-    cd ~/RemoteGuard-Env/
-    docker compose -f docker-compose.yml up -d
+success "Docker Configurado com Sucesso!\n"
 
-    if [ $? -eq 0 ]; then
-        success "Containeres Criados e Configurados com Sucesso!\n"
-    else
-        error "Erro ao Configurar os Containeres!\n"
-    fi
+# Criando e Configurando Containeres
+info "Iniciando Criação e Configuração dos Containeres da Aplicação...\n"
+sudo docker compose -f ~/RemoteGuard-Env/docker-compose.yml up -d
 
-    info "Fim da Instalação e Configuração do Ambiente RemoteGuard!\n"
-EOF
+if [ $? -eq 0 ]
+        then success "Containeres Criados e Configurados com Sucesso!\n"
+        else error "Erro ao Configurar os Containeres!\n"
+fi
+
+success "Fim da Instalação e Configuração do Ambiente RemoteGuard!\n"
+newgrp docker
